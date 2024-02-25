@@ -37,12 +37,9 @@ class Record:
         self.phones.remove(Phone(phone))
     
     def edit_phone(self, phone: str, new_phone: str):
-        #self.phones = list(map(lambda item: Phone(new_phone) if item.value == phone else item, self.phones))
         self.phones = [Phone(new_phone) if item.value == phone else item for item in self.phones]
    
     def find_phone(self, phone: str):
-        #return [item.value if item.value == phone else '' for item in self.phones]
-        #return list(filter(lambda item: item.value == phone, self.phones))[0]
         for item in self.phones:
             if item.value == phone:
                 return item
