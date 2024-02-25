@@ -1,7 +1,6 @@
 import re
 
 from collections import UserDict
-from dataclasses import dataclass
 
 
 class Field:
@@ -13,24 +12,17 @@ class Field:
 
 
 class Name(Field):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return str(self.value)
+    pass
 
 
 class Phone(Field):
     def __validation(self, value):
-        if len(re.search(r"[^0-9]+", r"", value)) == 10:
+        if len(re.search(r'\d', value).string) == 10:
             return value
         raise ValueError ('The number of digits in the number does not correspond to 10.')
     
     def __init__(self, value):
-        self.value = self.__validation(value)
-
-    def __str__(self):
-        return str(self.value)
+        super().__init__(self.__validation(value))
 
 
 class Record:
@@ -45,33 +37,28 @@ class Record:
         self.phones.remove(Phone(phone))
     
     def edit_phone(self, phone: str, new_phone: str):
-        self.__edit_phone(Phone(phone), Phone(new_phone))
-    
-    def __edit_phone(self, phone: Phone, new_phone: Phone):
-        self.phones[self.__find_phone(Phone(phone))] = new_phone
+        #self.phones = list(map(lambda item: Phone(new_phone) if item.value == phone else item, self.phones))
+        self.phones = [Phone(new_phone) if item.value == phone else item for item in self.phones]
    
     def find_phone(self, phone: str):
-        return self.phones[self.__find_phone(Phone(phone))]
-    
-    def __find_phone(self, phone: Phone):
-        try:
-            return self.phones.index(phone)
-        except:
-            return None
+        #return [item.value if item.value == phone else '' for item in self.phones]
+        #return list(filter(lambda item: item.value == phone, self.phones))[0]
+        for item in self.phones:
+            if item.value == phone:
+                return item
     
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
 
-@dataclass
 class AddressBook(UserDict):
     def add_record(self, record: Record):
-        self.data.update(record)
-
+        self.data[record.name.value] = record
+    
     def find(self, name: str):
-        for record in self.data.keys():
-            if record == name:
-                return self.data[name]
+        if self.data[name]:
+            return self.data[name]
+        return None
     
     def delete(self, name: str):
-        self.data.popitem(Name(name))
+        self.data.pop(name)
